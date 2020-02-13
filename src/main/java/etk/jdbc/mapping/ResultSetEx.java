@@ -1,5 +1,6 @@
 package etk.jdbc.mapping;
 
+import etk.text.Strings;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -25,7 +26,7 @@ public class ResultSetEx {
         return resultSet.getString(columnName);
     }
 
-    protected String getString() throws SQLException {
+    public String getString() throws SQLException {
         return this.resultSet.getString(1);
     }
 
@@ -37,7 +38,7 @@ public class ResultSetEx {
         return this.wrapper(this.getBoolean(columnName));
     }
 
-    protected Boolean getBoolean() throws SQLException {
+    public Boolean getBoolean() throws SQLException {
         return this.wrapper(this.resultSet.getBoolean(1));
     }
 
@@ -49,7 +50,7 @@ public class ResultSetEx {
         return this.wrapper(this.getShort(columnName));
     }
 
-    protected Short getShort() throws SQLException {
+    public Short getShort() throws SQLException {
         return this.wrapper(this.resultSet.getShort(1));
     }
 
@@ -61,7 +62,7 @@ public class ResultSetEx {
         return this.wrapper(this.getInt(columnName));
     }
 
-    protected Integer getInt() throws SQLException {
+    public Integer getInt() throws SQLException {
         return this.wrapper(this.resultSet.getInt(1));
     }
 
@@ -73,7 +74,7 @@ public class ResultSetEx {
         return this.wrapper(this.getLong(columnName));
     }
 
-    protected Long getLong() throws SQLException {
+    public Long getLong() throws SQLException {
         return this.wrapper(this.resultSet.getLong(1));
     }
 
@@ -85,7 +86,7 @@ public class ResultSetEx {
         return this.wrapper(this.getFloat(columnName));
     }
 
-    protected Float getFloat() throws SQLException {
+    public Float getFloat() throws SQLException {
         return this.wrapper(this.resultSet.getFloat(1));
     }
 
@@ -97,7 +98,7 @@ public class ResultSetEx {
         return this.wrapper(this.getDouble(columnName));
     }
 
-    protected Double getDouble() throws SQLException {
+    public Double getDouble() throws SQLException {
         return this.wrapper(this.resultSet.getDouble(1));
     }
 
@@ -105,25 +106,45 @@ public class ResultSetEx {
         return resultSet.getBigDecimal(columnName);
     }
 
-    protected BigDecimal getBigDecimal() throws SQLException {
+    public BigDecimal getBigDecimal() throws SQLException {
         return this.resultSet.getBigDecimal(1);
     }
 
-    protected Character getCharacter() throws SQLException {
+    public Character getCharacter() throws SQLException {
         return Optional.ofNullable(this.getString())
             .filter(str -> !str.isEmpty())
             .map(str -> str.charAt(0))
             .orElse(null);
     }
 
-    protected Character getCharacter(String columnName) throws SQLException {
+    public Character getCharacter(String columnName) throws SQLException {
         return Optional.ofNullable(this.getString(columnName))
             .filter(str -> !str.isEmpty())
             .map(str -> str.charAt(0))
             .orElse(null);
     }
 
-    protected LocalDate getLocalDate() throws SQLException {
+    public <T> T getEnum(Class type) throws SQLException {
+        String string = this.getString();
+
+        if (!Strings.isValid(string)) {
+            return null;
+        }
+
+        return (T) Enum.valueOf(type, string);
+    }
+
+    public <T> T getEnum(String columnName, Class type) throws SQLException {
+        String string = this.getString(columnName);
+
+        if (!Strings.isValid(string)) {
+            return null;
+        }
+
+        return (T) Enum.valueOf(type, string);
+    }
+
+    public LocalDate getLocalDate() throws SQLException {
         return Optional.ofNullable(this.resultSet.getDate(1))
             .map(Date::toLocalDate)
             .orElse(null);
@@ -135,7 +156,7 @@ public class ResultSetEx {
             .orElse(null);
     }
 
-    protected LocalDateTime getLocalDateTime() throws SQLException {
+    public LocalDateTime getLocalDateTime() throws SQLException {
         return Optional.ofNullable(this.resultSet.getTimestamp(1))
             .map(Timestamp::toLocalDateTime)
             .orElse(null);
@@ -147,7 +168,7 @@ public class ResultSetEx {
             .orElse(null);
     }
 
-    protected Instant getInstant() throws SQLException {
+    public Instant getInstant() throws SQLException {
         return Optional.ofNullable(this.resultSet.getTimestamp(1))
             .map(Timestamp::toInstant)
             .orElse(null);

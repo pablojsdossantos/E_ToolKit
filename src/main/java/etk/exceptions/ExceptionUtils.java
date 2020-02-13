@@ -7,6 +7,10 @@ import java.util.concurrent.CompletionException;
  * @author Pablo JS dos Santos
  */
 public class ExceptionUtils {
+    public static boolean isCausedBy(Throwable throwable, Class cause) {
+        return lookup(throwable, cause) != null;
+    }
+
     public static <T> T lookup(Throwable throwable, Class<T> clazz) {
         if (throwable == null || clazz.isInstance(throwable)) {
             return (T) throwable;

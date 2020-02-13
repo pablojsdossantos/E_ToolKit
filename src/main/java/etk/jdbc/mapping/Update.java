@@ -14,12 +14,12 @@ public class Update extends SqlBuilder<Update> {
         this.session = session;
     }
 
-    public Long execute() {
+    public long execute() {
         Sql sql = this.buildSql();
         return this.session.executeUpdate(sql, false);
     }
 
-    public Long executeAndReturnGeneratedKey() {
+    public long executeAndReturnGeneratedKey() {
         Sql sql = this.buildSql();
         return this.session.executeUpdate(sql, true);
     }

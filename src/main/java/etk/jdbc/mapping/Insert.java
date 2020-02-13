@@ -1,5 +1,6 @@
 package etk.jdbc.mapping;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,13 +11,21 @@ import java.util.List;
  */
 public class Insert {
     private String table;
+    private boolean ignore;
     private List<String> columnNames;
     private SqlBuilder<SqlBuilder> sqlBuilder;
 
-    private Insert(String table) {
+    private Insert(String table, boolean ignore) {
         this.table = table;
+        this.ignore = ignore;
         this.columnNames = new LinkedList<>();
         this.sqlBuilder = new SqlBuilder();
+    }
+
+    public Insert value(String columnName, Enum value) {
+        this.sqlBuilder.bind(columnName, value);
+        this.columnNames.add(columnName);
+        return this;
     }
 
     public Insert value(String columnName, String value) {
@@ -55,6 +64,12 @@ public class Insert {
         return this;
     }
 
+    public Insert value(String columnName, Instant value) {
+        this.sqlBuilder.bind(columnName, value);
+        this.columnNames.add(columnName);
+        return this;
+    }
+
     public Sql build() {
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
@@ -67,7 +82,9 @@ public class Insert {
         columns.delete(columns.length() - 2, columns.length());
         values.delete(values.length() - 2, values.length());
 
-        StringBuilder sql = new StringBuilder("INSERT INTO ")
+        StringBuilder sql = new StringBuilder("INSERT")
+            .append(this.ignore ? " IGNORE" : "")
+            .append(" INTO ")
             .append(this.table)
             .append(" (")
             .append(columns.toString())
@@ -80,6 +97,10 @@ public class Insert {
     }
 
     public static Insert into(String table) {
-        return new Insert(table);
+        return new Insert(table, false);
+    }
+
+    public static Insert ignoreInto(String table) {
+        return new Insert(table, true);
     }
 }

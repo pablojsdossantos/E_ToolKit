@@ -41,6 +41,14 @@ public class Pair<L, R> implements Serializable {
         this.right = right;
     }
 
+    public boolean hasRight() {
+        return this.right != null;
+    }
+
+    public boolean hasLeft() {
+        return this.left != null;
+    }
+
     @Override
     public int hashCode() {
         int hash = 3;
@@ -75,5 +83,9 @@ public class Pair<L, R> implements Serializable {
     @Override
     public String toString() {
         return "[" + left + "][" + right + "]";
+    }
+
+    public static <L, R> Pair<L, R> of(L left, R right) {
+        return new Pair<L, R>(left, right);
     }
 }

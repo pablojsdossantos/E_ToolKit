@@ -88,6 +88,10 @@ public class SqlBuilder<T extends SqlBuilder> {
         return this.bind(variable, ColumnType.UUID, value);
     }
 
+    public T bind(String variable, Enum value) {
+        return this.bind(variable, ColumnType.ENUM, value);
+    }
+
     private T bind(String variable, ColumnType type, Object value) {
         this.variables.put(this.toParameter(variable), new Pair<>(type, value));
         return (T) this;
@@ -101,7 +105,7 @@ public class SqlBuilder<T extends SqlBuilder> {
         return String.format("${%s}", variable);
     }
 
-    public Sql buildSql() {
+    protected Sql buildSql() {
         List<Pair<ColumnType, Object>> parameters = new ArrayList<>();
         StringBuilder sql = new StringBuilder(this.statement);
 

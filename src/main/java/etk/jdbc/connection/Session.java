@@ -113,6 +113,7 @@ public class Session implements Closeable {
             case STRING:
             case UUID:
             case CHAR:
+            case ENUM:
                 statement.setString(index, parameter.getRight().toString());
                 break;
 
