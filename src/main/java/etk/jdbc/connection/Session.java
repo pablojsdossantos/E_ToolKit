@@ -22,7 +22,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,7 +140,7 @@ public class Session implements Closeable {
                 break;
 
             case TIMESTAMP:
-                statement.setTimestamp(index, new Timestamp(((java.util.Date) parameter.getRight()).getTime()));
+                this.setTimestamp(statement, index, parameter.getRight());
                 break;
 
             case BOOLEAN:
@@ -159,6 +161,7 @@ public class Session implements Closeable {
         if (value instanceof Date) {
             Date sqlDate = (Date) value;
             statement.setDate(index, sqlDate);
+            return;
         }
 
         if (value instanceof LocalDate) {
@@ -176,6 +179,37 @@ public class Session implements Closeable {
         }
 
         throw new PersistenceException("EJCSD182", "Unsupportd Date Value", null);
+    }
+
+    private void setTimestamp(PreparedStatement statement, int index, Object value) throws SQLException {
+        if (value instanceof Instant) {
+            Instant instant = (Instant) value;
+            Timestamp timestamp = Timestamp.from(instant);
+            statement.setTimestamp(index, timestamp);
+            return;
+        }
+
+        if (value instanceof LocalDateTime) {
+            LocalDateTime localDateTime = (LocalDateTime) value;
+            Timestamp timestamp = Timestamp.valueOf(localDateTime);
+            statement.setTimestamp(index, timestamp);
+            return;
+        }
+
+        if (value instanceof java.util.Date) {
+            java.util.Date date = (java.util.Date) value;
+            Timestamp timestamp = new Timestamp(date.getTime());
+            statement.setTimestamp(index, timestamp);
+            return;
+        }
+
+        if (value instanceof Timestamp) {
+            Timestamp timestamp = (Timestamp) value;
+            statement.setTimestamp(index, timestamp);
+            return;
+        }
+
+        throw new PersistenceException("EJCSD212", "Unsupportd Timestamp Value", null);
     }
 
     @Override
