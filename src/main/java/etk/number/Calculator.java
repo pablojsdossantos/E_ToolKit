@@ -55,6 +55,11 @@ public strictfp class Calculator {
         }
     }
 
+    public Calculator withNanAsZero(boolean nanAsZero) {
+        this.nanAsZero = nanAsZero;
+        return this;
+    }
+
     public boolean isNaN() {
         return Double.isNaN(this.value);
     }
@@ -465,6 +470,6 @@ public strictfp class Calculator {
     }
 
     public static Calculator set(double value) {
-        return new Calculator(value, RoundingMode.HALF_DOWN, 5, false, true);
+        return new Calculator(value, RoundingMode.HALF_DOWN, 5, false, false);
     }
 }

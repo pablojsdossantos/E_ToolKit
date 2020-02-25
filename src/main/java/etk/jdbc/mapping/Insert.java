@@ -2,6 +2,7 @@ package etk.jdbc.mapping;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,14 +13,27 @@ import java.util.List;
 public class Insert {
     private String table;
     private boolean ignore;
+    private boolean onDuplicateKey;
     private List<String> columnNames;
+    private List<String> columnsToUpdate;
     private SqlBuilder<SqlBuilder> sqlBuilder;
 
     private Insert(String table, boolean ignore) {
         this.table = table;
         this.ignore = ignore;
         this.columnNames = new LinkedList<>();
+        this.columnsToUpdate = new ArrayList<>();
         this.sqlBuilder = new SqlBuilder();
+    }
+
+    public Insert onDuplicate() {
+        this.onDuplicateKey = true;
+        return this;
+    }
+
+    public Insert update(String columnName) {
+        this.columnsToUpdate.add(columnName);
+        return this;
     }
 
     public Insert value(String columnName, Enum value) {
@@ -75,8 +89,12 @@ public class Insert {
         StringBuilder values = new StringBuilder();
 
         for (String columnName : this.columnNames) {
-            columns.append(columnName).append(", ");
-            values.append("${").append(columnName).append("}, ");
+            columns.append(columnName)
+                .append(", ");
+
+            values.append("${")
+                .append(columnName)
+                .append("}, ");
         }
 
         columns.delete(columns.length() - 2, columns.length());
@@ -91,6 +109,22 @@ public class Insert {
             .append(") VALUES (")
             .append(values.toString())
             .append(")");
+
+        if (this.onDuplicateKey) {
+            sql.append(" ON DUPLICATE KEY UPDATE ");
+
+            StringBuilder updateBuilder = new StringBuilder();
+
+            for (String columnName : this.columnsToUpdate) {
+                updateBuilder.append(columnName)
+                    .append(" = ${")
+                    .append(columnName)
+                    .append("}, ");
+            }
+
+            updateBuilder.delete(updateBuilder.length() - 2, updateBuilder.length());
+            sql.append(updateBuilder);
+        }
 
         this.sqlBuilder.setStatement(sql.toString());
         return this.sqlBuilder.buildSql();
