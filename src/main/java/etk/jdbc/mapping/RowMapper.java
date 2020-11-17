@@ -22,5 +22,5 @@ public interface RowMapper<T> {
     public static RowMapper<LocalDateTime> LOCAL_DATE_TIME_MAPPER = result -> result.getLocalDateTime();
     public static RowMapper<Instant> INSTANT_MAPPER = result -> result.getInstant();
 
-    public T map(ResultSetEx resultSet) throws SQLException;
+    public T map(DbResult resultSet) throws SQLException;
 }

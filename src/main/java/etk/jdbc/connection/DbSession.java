@@ -8,12 +8,14 @@ package etk.jdbc.connection;
 import etk.data.Pair;
 import etk.jdbc.exceptions.PersistenceException;
 import etk.jdbc.mapping.ColumnType;
+import etk.jdbc.mapping.DbResult;
 import etk.jdbc.mapping.Query;
-import etk.jdbc.mapping.ResultSetEx;
 import etk.jdbc.mapping.RowMapper;
 import etk.jdbc.mapping.Sql;
 import etk.jdbc.mapping.Update;
 import java.io.Closeable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -27,15 +29,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
  * @author Pablo JS dos Santos
  */
-public class Session implements Closeable {
+public class DbSession implements Closeable {
     private Connection connection;
 
-    public Session(Connection connection) {
+    public DbSession(Connection connection) {
         this.connection = connection;
     }
 
@@ -77,7 +80,7 @@ public class Session implements Closeable {
     public <T> List<T> executeQuery(Sql sql, RowMapper<T> mapper) {
         try (PreparedStatement statement = this.preparedStatement(sql, false)) {
             ResultSet resultSet = statement.executeQuery();
-            ResultSetEx wrapper = new ResultSetEx(resultSet);
+            DbResult wrapper = new DbResult(resultSet);
 
             List<T> rows = new ArrayList<>();
 
@@ -113,7 +116,7 @@ public class Session implements Closeable {
 
         switch (parameter.getLeft()) {
             case STRING:
-            case UUID:
+            case UUID_TXT:
             case CHAR:
             case ENUM:
                 statement.setString(index, parameter.getRight().toString());
@@ -151,10 +154,26 @@ public class Session implements Closeable {
                 statement.setBytes(index, (byte[]) parameter.getRight());
                 break;
 
+            case UUID_BIN:
+                this.setUuidAsBinary(statement, index, parameter.getRight());
+                break;
+
             default:
                 statement.setObject(index, parameter.getRight(), parameter.getLeft().getSqlType());
                 break;
         }
+    }
+
+    private void setUuidAsBinary(PreparedStatement statement, int index, Object value) throws SQLException {
+        UUID uuid = (UUID) value;
+        byte[] uuidBytes = new byte[16];
+
+        ByteBuffer.wrap(uuidBytes)
+            .order(ByteOrder.BIG_ENDIAN)
+            .putLong(uuid.getMostSignificantBits())
+            .putLong(uuid.getLeastSignificantBits());
+
+        statement.setBytes(index, uuidBytes);
     }
 
     private void setDate(PreparedStatement statement, int index, Object value) throws SQLException {

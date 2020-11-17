@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
@@ -24,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.crypto.BadPaddingException;
@@ -497,9 +500,9 @@ public class Strings {
         StringBuilder builder = new StringBuilder();
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(gzipString);
-                GZIPInputStream gzipStream = new GZIPInputStream(inputStream);
-                InputStreamReader inputReader = new InputStreamReader(gzipStream, charset);
-                BufferedReader reader = new BufferedReader(inputReader)) {
+            GZIPInputStream gzipStream = new GZIPInputStream(inputStream);
+            InputStreamReader inputReader = new InputStreamReader(gzipStream, charset);
+            BufferedReader reader = new BufferedReader(inputReader)) {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 if (builder.length() > 0) {
                     builder.append("\n");
@@ -539,7 +542,7 @@ public class Strings {
 
     public static String toStackTrace(Throwable throwable) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                PrintStream stream = new PrintStream(outputStream)) {
+            PrintStream stream = new PrintStream(outputStream)) {
             throwable.printStackTrace(stream);
             return outputStream.toString();
         } catch (IOException ex) {
@@ -582,7 +585,7 @@ public class Strings {
         List<String> occurrences = new ArrayList<>();
 
         for (int firstIndex = stringBuilder.indexOf(begining); firstIndex > -1;
-                firstIndex = stringBuilder.indexOf(begining)) {
+            firstIndex = stringBuilder.indexOf(begining)) {
             int lastIndex = stringBuilder.indexOf(ending, firstIndex + begining.length());
             if (lastIndex == -1) {
                 break;
@@ -639,5 +642,36 @@ public class Strings {
         builder.append(string.substring(1).toLowerCase());
 
         return builder.toString();
+    }
+
+    public static void main(String[] args) {
+        UUID id = UUID.randomUUID();
+        System.out.println("id = " + id);
+
+        byte[] uuidBytes = new byte[16];
+        System.out.println("uuidBytes = " + uuidBytes);
+
+        ByteBuffer buffer = ByteBuffer.wrap(uuidBytes)
+            .order(ByteOrder.BIG_ENDIAN)
+            .putLong(id.getMostSignificantBits())
+            .putLong(id.getLeastSignificantBits());
+
+        long mostSignificantBits = id.getMostSignificantBits();
+        System.out.println("mostSignificantBits = " + mostSignificantBits);
+        long leastSignificantBits = id.getLeastSignificantBits();
+        System.out.println("leastSignificantBits = " + leastSignificantBits);
+
+        buffer = ByteBuffer.wrap(uuidBytes);
+        System.out.println("new buffer = " + buffer);
+
+        long most = buffer.getLong(0);
+        System.out.println("l1 = " + most);
+        long least = buffer.getLong(8);
+        System.out.println("l2 = " + least);
+
+        UUID u = new UUID(most, least);
+        System.out.println("u = " + u);
+        System.out.println(u.equals(id));
+
     }
 }

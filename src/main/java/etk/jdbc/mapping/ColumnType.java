@@ -22,7 +22,8 @@ public enum ColumnType {
     TIMESTAMP(Types.TIMESTAMP),
     BOOLEAN(Types.BOOLEAN),
     BLOB(Types.BLOB),
-    UUID(Types.VARCHAR),
+    UUID_TXT(Types.VARCHAR),
+    UUID_BIN(Types.BINARY),
     ENUM(Types.VARCHAR);
 
     private int sqlType;

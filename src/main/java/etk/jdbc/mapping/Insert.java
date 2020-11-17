@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -26,13 +27,15 @@ public class Insert {
         this.sqlBuilder = new SqlBuilder();
     }
 
-    public Insert onDuplicate() {
-        this.onDuplicateKey = true;
+    public Insert value(String columnName, UUID value, boolean binary) {
+        this.sqlBuilder.bind(columnName, value, binary);
+        this.columnNames.add(columnName);
         return this;
     }
 
-    public Insert update(String columnName) {
-        this.columnsToUpdate.add(columnName);
+    public Insert value(String columnName, Boolean value) {
+        this.sqlBuilder.bind(columnName, value);
+        this.columnNames.add(columnName);
         return this;
     }
 
@@ -84,6 +87,71 @@ public class Insert {
         return this;
     }
 
+    public Insert onDuplicate() {
+        this.onDuplicateKey = true;
+        return this;
+    }
+
+    public Insert update(String columnName, UUID value, boolean binary) {
+        this.sqlBuilder.bind("updt_" + columnName, value, binary);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Boolean value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Enum value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, String value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Integer value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Character value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Long value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Double value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, LocalDate value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
+    public Insert update(String columnName, Instant value) {
+        this.sqlBuilder.bind("updt_" + columnName, value);
+        this.columnsToUpdate.add(columnName);
+        return this;
+    }
+
     public Sql build() {
         StringBuilder columns = new StringBuilder();
         StringBuilder values = new StringBuilder();
@@ -117,7 +185,7 @@ public class Insert {
 
             for (String columnName : this.columnsToUpdate) {
                 updateBuilder.append(columnName)
-                    .append(" = ${")
+                    .append(" = ${updt_")
                     .append(columnName)
                     .append("}, ");
             }

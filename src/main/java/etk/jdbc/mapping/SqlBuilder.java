@@ -85,7 +85,11 @@ public class SqlBuilder<T extends SqlBuilder> {
     }
 
     public T bind(String variable, UUID value) {
-        return this.bind(variable, ColumnType.UUID, value);
+        return this.bind(variable, value, false);
+    }
+
+    public T bind(String variable, UUID value, boolean binary) {
+        return this.bind(variable, binary ? ColumnType.UUID_BIN : ColumnType.UUID_TXT, value);
     }
 
     public T bind(String variable, Enum value) {

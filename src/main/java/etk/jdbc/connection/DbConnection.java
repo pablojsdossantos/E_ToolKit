@@ -11,23 +11,23 @@ import javax.sql.DataSource;
  *
  * @author Pablo JS dos Santos
  */
-public class ExConnection {
+public class DbConnection {
     private DataSource dataSource;
     private Executor executor;
 
-    public ExConnection(DataSource dataSource, Executor executorService) {
+    public DbConnection(DataSource dataSource, Executor executorService) {
         this.dataSource = dataSource;
         this.executor = executorService;
     }
 
-    public <T> CompletionStage<T> writeAsync(Function<Session, T> action) {
-        return CompletableFuture.supplyAsync(() -> this.writeSession(action), this.executor);
+    public <T> CompletionStage<T> writeAsync(Function<DbSession, T> action) {
+        return CompletableFuture.supplyAsync(() -> this.write(action), this.executor);
     }
 
-    public <T> T writeSession(Function<Session, T> action) {
+    public <T> T write(Function<DbSession, T> action) {
         T value = null;
 
-        try (Session session = new Session(this.dataSource.getConnection())) {
+        try (DbSession session = new DbSession(this.dataSource.getConnection())) {
             session.execute("BEGIN");
 
             try {
@@ -47,12 +47,12 @@ public class ExConnection {
         return value;
     }
 
-    public <T> CompletionStage<T> readAsync(Function<Session, T> action) {
-        return CompletableFuture.supplyAsync(() -> this.readSession(action), this.executor);
+    public <T> CompletionStage<T> readAsync(Function<DbSession, T> action) {
+        return CompletableFuture.supplyAsync(() -> this.read(action), this.executor);
     }
 
-    public <T> T readSession(Function<Session, T> action) {
-        try (Session session = new Session(this.dataSource.getConnection())) {
+    public <T> T read(Function<DbSession, T> action) {
+        try (DbSession session = new DbSession(this.dataSource.getConnection())) {
             return action.apply(session);
         } catch (PersistenceException e) {
             throw e;

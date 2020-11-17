@@ -1,15 +1,15 @@
 package etk.jdbc.mapping;
 
-import etk.jdbc.connection.Session;
+import etk.jdbc.connection.DbSession;
 
 /**
  *
  * @author Pablo JS dos Santos
  */
 public class Update extends SqlBuilder<Update> {
-    private Session session;
+    private DbSession session;
 
-    public Update(Session session, String statement) {
+    public Update(DbSession session, String statement) {
         super(statement);
         this.session = session;
     }

@@ -1,6 +1,6 @@
 package etk.jdbc.mapping;
 
-import etk.jdbc.connection.Session;
+import etk.jdbc.connection.DbSession;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +9,10 @@ import java.util.Optional;
  * @author Pablo JS dos Santos
  */
 public class Query<T> extends SqlBuilder<Query<T>> {
-    private Session session;
+    private DbSession session;
     private RowMapper<T> mapper;
 
-    public Query(Session session, String statement) {
+    public Query(DbSession session, String statement) {
         super(statement);
         this.session = session;
     }
