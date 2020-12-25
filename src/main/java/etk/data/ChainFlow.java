@@ -108,32 +108,32 @@ public class ChainFlow {
         return stage;
     }
 
-    public <T, W> ChainFlow then(Function<T, W> function) {
+    public <T, W> ChainFlow thenApply(Function<T, W> function) {
         this.next = new ChainFlow(function, null, null, null, this, null, null, false);
         return this.next;
     }
 
-    public <T, W> ChainFlow thenAsync(Function<T, W> function) {
+    public <T, W> ChainFlow thenCompose(Function<T, W> function) {
         this.next = new ChainFlow(function, null, null, null, this, null, null, true);
         return this.next;
     }
 
-    public <T> ChainFlow then(Consumer<T> consumer) {
+    public <T> ChainFlow thenAccept(Consumer<T> consumer) {
         this.next = new ChainFlow(null, consumer, null, null, this, null, null, false);
         return this.next;
     }
 
-    public <T> ChainFlow then(Supplier<T> supplier) {
+    public <T> ChainFlow thenSupply(Supplier<T> supplier) {
         this.next = new ChainFlow(null, null, supplier, null, this, null, null, false);
         return this.next;
     }
 
-    public <T> ChainFlow thenAsync(Supplier<T> supplier) {
+    public <T> ChainFlow thenCompose(Supplier<T> supplier) {
         this.next = new ChainFlow(null, null, supplier, null, this, null, null, true);
         return this.next;
     }
 
-    public ChainFlow then(Runnable runnable) {
+    public ChainFlow thenApply(Runnable runnable) {
         this.next = new ChainFlow(null, null, null, runnable, this, null, null, false);
         return this.next;
     }
@@ -143,6 +143,14 @@ public class ChainFlow {
     }
 
     public static ChainFlow when(CompletionStage stage) {
+        return new ChainFlow(null, null, null, null, null, null, stage, true);
+    }
+
+    public static ChainFlow of(Object value) {
+        return new ChainFlow(null, null, null, null, null, null, value, false);
+    }
+
+    public static ChainFlow of(CompletionStage stage) {
         return new ChainFlow(null, null, null, null, null, null, stage, true);
     }
 }
