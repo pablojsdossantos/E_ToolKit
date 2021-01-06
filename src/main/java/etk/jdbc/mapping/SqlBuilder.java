@@ -6,9 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -17,7 +15,7 @@ import java.util.UUID;
  */
 public class SqlBuilder<T extends SqlBuilder> {
     private String statement;
-    private Map<String, Pair<ColumnType, Object>> variables;
+    private SqlVariableMap variables;
 
     public SqlBuilder() {
         this(null);
@@ -25,7 +23,7 @@ public class SqlBuilder<T extends SqlBuilder> {
 
     public SqlBuilder(String statement) {
         this.statement = statement;
-        this.variables = new HashMap<>();
+        this.variables = new SqlVariableMap();
     }
 
     public String getStatement() {
@@ -36,77 +34,83 @@ public class SqlBuilder<T extends SqlBuilder> {
         this.statement = statement;
     }
 
-    public Map<String, Pair<ColumnType, Object>> getVariables() {
+    public SqlVariableMap getVariables() {
         return variables;
     }
 
-    public void setVariables(Map<String, Pair<ColumnType, Object>> variables) {
+    public T setVariables(SqlVariableMap variables) {
         this.variables = variables;
-    }
-
-    public T bind(String variable, Boolean value) {
-        return this.bind(variable, ColumnType.BOOLEAN, value);
-    }
-
-    public T bind(String variable, String value) {
-        return this.bind(variable, ColumnType.STRING, value);
-    }
-
-    public T bind(String variable, Character value) {
-        return this.bind(variable, ColumnType.CHAR, value);
-    }
-
-    public T bind(String variable, Integer value) {
-        return this.bind(variable, ColumnType.INTEGER, value);
-    }
-
-    public T bind(String variable, Double value) {
-        return this.bind(variable, ColumnType.DOUBLE, value);
-    }
-
-    public T bind(String variable, Long value) {
-        return this.bind(variable, ColumnType.LONG, value);
-    }
-
-    public T bind(String variable, Date value) {
-        return this.bind(variable, ColumnType.DATE, value);
-    }
-
-    public T bind(String variable, LocalDate value) {
-        return this.bind(variable, ColumnType.DATE, value);
-    }
-
-    public T bind(String variable, Instant value) {
-        return this.bind(variable, ColumnType.TIMESTAMP, value);
-    }
-
-    public T bind(String variable, LocalDateTime value) {
-        return this.bind(variable, ColumnType.TIMESTAMP, value);
-    }
-
-    public T bind(String variable, UUID value) {
-        return this.bind(variable, value, false);
-    }
-
-    public T bind(String variable, UUID value, boolean binary) {
-        return this.bind(variable, binary ? ColumnType.UUID_BIN : ColumnType.UUID_TXT, value);
-    }
-
-    public T bind(String variable, Enum value) {
-        return this.bind(variable, ColumnType.ENUM, value);
-    }
-
-    private T bind(String variable, ColumnType type, Object value) {
-        this.variables.put(this.toParameter(variable), new Pair<>(type, value));
         return (T) this;
     }
 
-    private String toParameter(String variable) {
-        variable = variable.replace("$", "");
-        variable = variable.replace("{", "");
-        variable = variable.replace("}", "");
+    public T bind(String variable, Boolean value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
 
-        return String.format("${%s}", variable);
+    public T bind(String variable, String value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Character value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Integer value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Double value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Long value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Date value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, LocalDate value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, Instant value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, LocalDateTime value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, UUID value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    public T bind(String variable, UUID value, boolean binary) {
+        this.variables.bind(variable, value, binary);
+        return (T) this;
+    }
+
+    public T bind(String variable, Enum value) {
+        this.variables.bind(variable, value);
+        return (T) this;
+    }
+
+    private T bind(String variable, ColumnType type, Object value) {
+        this.variables.bind(variable, type, value);
+        return (T) this;
     }
 
     protected Sql buildSql() {
